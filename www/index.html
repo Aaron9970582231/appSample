@@ -127,7 +127,7 @@ function ListDBValues() {
         for (var i = 0; i < result.rows.length; i++) {
           var row = result.rows.item(i);
           $('#lbUsers').append('<br><a style="color:#000000;" href="view_mem.html?id='+row.id+'">' + row.name + '. ' +
-          row.membership_no + '</a>'+ ' ' + '<img src="photo/'+row.photo+'" />');
+          row.membership_no + '</a>');
         }
       }
      },errorHandler);
