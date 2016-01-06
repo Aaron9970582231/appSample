@@ -34,7 +34,7 @@ html{
 }
 
 .form-register-with-email .form-title-row{
-    text-align: center;
+    text-align: left;
     margin-bottom: 50px;
 }
 
@@ -53,7 +53,7 @@ html{
     box-sizing: border-box;
     color:  #5f5f5f;
     width: 125px;
-    text-align: right;
+    text-align: left;
     padding-right: 25px;
 }
 
@@ -108,8 +108,8 @@ html{
     background-color: #d6f0c3;
 }
 
-.form-register-with-email:after{
-    content: 'OR';
+.form-register-with-email:after1{
+    content: '';
     position: absolute;
     bottom: 330px;
     right: -100px;

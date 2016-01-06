@@ -1,122 +1,235 @@
-<!DOCTYPE html>
-<!--
-    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
-
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-     KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="format-detection" content="telephone=no" />
-        <meta name="msapplication-tap-highlight" content="no" />
-        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/index.css" />
-        <link rel="stylesheet" type="text/css" href="css/form-register.css" />
-        <title>Register</title>
-        <link href='http://fonts.googleapis.com/css?family=Bitter' rel='stylesheet' type='text/css'>
+<head>
 
-    </head>
-    <body>
-         <div class="main-content">
+<!--
+This is an example that shows how to create an application that uses
+an embedded sqlite database
+in a mobile device (iphone,ipod,ipad,android using phonegap, jquery
+and sqlite.
 
-        <!-- You only need this form and the form-register.css -->
+Your phonegap project will already contain the phonegap.js.
 
-        <form class="form-register" method="post" action="#">
+You will need to download and add to your project the jquery.min.js
+file
 
-            <div class="form-register-with-email">
+The application will create a database called WebSqlDb with a
+table in it called User, which contains three fields  UserId,
+FirstName and LastName
 
-                <div class="form-white-background">
+When the application is run the firsttime, if the local database does
+not exist, the application
+will create the database and the table.
 
-                    <div class="form-title-row">
-                        <h1>Create an account</h1>
-                    </div>
+The application shows two text boxes which you can use to add values
+to the database using the add record button
 
-                    <div class="form-row">
-                        <label>
-                            <span>Name</span>
-                            <input type="text" name="name" id="name">
-                        </label>
-                    </div>
+The application also has a refresh button which will get the data from
+the database and show it on the screen
 
-                    <div class="form-row">
-                        <label>
-                            <span>Email</span>
-                            <input type="email" name="email">
-                        </label>
-                    </div>
+When the application is run on the device the onBodyLoad() function is
+called, which sets up the database and table
 
-                    <div class="form-row">
-                        <label>
-                            <span>Password</span>
-                            <input type="password" name="password">
-                        </label>
-                    </div>
+The Add Record button calls the AddValueToDB() function
 
-                    <div class="form-row">
-                        <label class="form-checkbox">
-                            <input type="checkbox" name="checkbox" checked>
-                            <span>I agree to the <a href="#">terms and conditions</a></span>
-                        </label>
-                    </div>
+The Refresh button calls the ListDBValues() function
 
-                    <div class="form-row">
-                        <button type="submit" id="send">Register</button>
-                    </div>
+There are a few alert statements in this application, which are only
+there for debuggin purposes.  They look like this
+alert("DEBUGGING: followed by some text");
 
-                </div>
+These are only in the application to indicate where the application is
+at when it is processing functions, etc
 
-                <a href="form-login.html" class="form-log-in-with-existing">Already have an account? Login here &rarr;</a>
+You will need to comment these out before you deploy/sell your
+application
+-->
+<!-- Change this if you want to allow scaling -->
+<meta name="viewport" content="width=default-width, user-scalable=no" />
+<meta http-equiv="Content-type" content="text/html;charset=utf-8">
+<title>Embedded Sql Example</title>
+<!-- include the next line to use phonegap javascript functions -->
+<!-- include the next line to use jquery functions in your application
+you must download this and include the directory your html file is in
+-->
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/jquery.csv-0.71.js"></script>
+<link rel="stylesheet" type="text/css" href="css/styles.css" />
+<link rel="stylesheet" type="text/css" href="css/index.css" />
+<!-- main scripts used in this example -->
+<script type="text/javascript" charset="utf-8">
 
-            </div>
+// global variables
+var db;
+var shortName = 'WebSqlDB';
+var version = '1.0';
+var displayName = 'WebSqlDB';
+var maxSize = 65535;
 
-            <div class="form-sign-in-with-social">
+// this is called when an error happens in a transaction
+function errorHandler(transaction, error) {
+   alert('Error: ' + error.message + ' code: ' + error.code);
 
-                <div class="form-row form-title-row">
-                    <span class="form-title">Sign in with</span>
-                </div>
+}
 
-                <a href="#" class="form-google-button">Google</a>
-                <a href="#" class="form-facebook-button">Facebook</a>
-                <a href="#" class="form-twitter-button">Twitter</a>
+// this is called when a successful transaction happens
+function successCallBack() {
+   //alert("DEBUGGING: success");
+}
 
-            </div>
+function nullHandler(){
 
-        </form>
+};
 
-    </div>
+// called when the application loads
+function onBodyLoad(){
+  // This alert is used to make sure the application is loaded correctly
+  // you can comment this out once you have the application working
+  //alert("DEBUGGING: we are in the onBodyLoad() function");
+  if (!window.openDatabase) {
+    // not all mobile devices support databases  if it does not, the following alert will display
+    // indicating the device will not be albe to run this application
+    alert('Databases are not supported in this browser.');
+    return;
+  }
 
+  // this line tries to open the database base locally on the device
+  // if it does not exist, it will create it and return a database object stored in variable db
+    db = openDatabase(shortName, version, displayName,maxSize);
+    // this line will try to create the table User in the database just created/openned
+    db.transaction(function(tx){
+    // you can uncomment this next line if you want the User table to be empty each time the application runs
+    //tx.executeSql( 'DROP TABLE member',nullHandler,nullHandler);
+    // this line actually creates the table User if it does not exist and sets up the three columns and their types
+    // note the UserId column is an auto incrementing column which is useful if you want to pull back distinct rows
+    // easily from the table.
+      //tx.executeSql( 'CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, name TEXT NOT NULL, membership_no TEXT NOT NULL)', [],nullHandler,errorHandler);
+      tx.executeSql( 'CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, name TEXT NOT NULL, membership_no TEXT NOT NULL, photo TEXT NOT NULL, signature TEXT NOT NULL, category TEXT NOT NULL, spouse_name TEXT NOT NULL, spouse_photo TEXT NOT NULL, d1_name TEXT NOT NULL, d1_photo TEXT NOT NULL, d2_name TEXT NOT NULL, d2_photo TEXT NOT NULL, d3_name TEXT NOT NULL, d3_photo TEXT NOT NULL, exit_status TEXT NOT NULL, exit_reason TEXT NOT NULL)', [],nullHandler,errorHandler);
+    },errorHandler,successCallBack);
+}
 
-        
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-        <script type="text/javascript">
-            app.initialize();
-        </script>
-        <script type="text/javascript">
-        window.onload = function()
-        {
-        document.getElementById('send').onclick = function(e)
-        {
-        alert(document.getElementById("name").value);
-        return false;
-   }
+// list the values in the database to the screen using jquery to update the #lbUsers element
+function ListDBValues() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  // this line clears out any content in the #lbUsers element on the page so that the next few lines will show updated
+  // content and not just keep repeating lines
+  $('#lbUsers').html('');
+  // this next section will select all the content from the User table and then go through it row by row
+  // appending the UserId  FirstName  LastName to the  #lbUsers element on the page
+  db.transaction(function(transaction) {
+   transaction.executeSql('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" ', [],
+     function(transaction, result) {
+      if (result != null && result.rows != null) {
+        for (var i = 0; i < result.rows.length; i++) {
+          var row = result.rows.item(i);
+          $('#lbUsers').append('<br><a style="color:#000000;" href="view_mem.html?id='+row.id+'">' + row.name + '. ' +
+          row.membership_no + '</a>'+ ' ' + '<img src="photo/'+row.photo+'" />');
+        }
+      }
+     },errorHandler);
+  },errorHandler,nullHandler);
+  return;
+}
+
+// this is the function that puts values into the database using the values from the text boxes on the screen
+function AddValueToDB() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  // this is the section that actually inserts the values into the User table
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MINOO ABADAN', 'A-001', 'A0001s.png', 'A0001sig.png', 'A', 'ROOMA', 'A0001w.png', '', 'A0001ud.png', '', 'A0001ud1.png', '', 'A0001ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MUKESH S. ACHARYA', 'A-015', 'A0002s.png', 'A0002sig.png', 'A', 'ASHA', 'A0002w.png', '', 'A0002ud.png', '', 'A0002ud1.png', '', 'A0002ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. RISHI M. ACHARYA', 'A-368', 'A0003s.png', 'A0003sig.png', 'A', '', 'A0003w.png', '', 'A0003ud.png', '', 'A0003ud1.png', '', 'A0003ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. YEZDI D. ACIDWALLA', 'A-016', 'A0004s.png', 'A0004sig.png', 'A', 'NAWAZ', 'A0004w.png', '', 'A0004ud.png', '', 'A0004ud1.png', '', 'A0004ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. DINSHAW P. ADENWALLA', 'A-017', 'A0006s.png', 'A0006sig.png', 'A', 'JASMINE', 'A0006w.png', '', 'A0006ud.png', '', 'A0006ud1.png', '', 'A0006ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('DR. SOLI DARA ADRIANWALA', 'A-020', 'A0007s.png', 'A0007sig.png', 'A', 'KHORSHED', 'A0007w.png', '', 'A0007ud.png', '', 'A0007ud1.png', '', 'A0007ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. PAMO S. ADVANI', 'A-021', 'A0008s.png', 'A0008sig.png', 'A', '', 'A0008w.png', '', 'A0008ud.png', '', 'A0008ud1.png', '', 'A0008ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. PASHUPATI K. ADVANI', 'A-037', 'A0009s.png', 'A0009sig.png', 'A', 'SANGITA', 'A0009w.png', 'ASHRITA', 'A0009ud.png', '', 'A0009ud1.png', '', 'A0009ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. SURESH G. ADVANI', 'A-041', 'A0010s.png', 'A0010sig.png', 'A', 'REKHA', 'A0010w.png', 'MONISHA', 'A0010ud.png', '', 'A0010ud1.png', '', 'A0010ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. HEMIN V. ADWALIA', 'A-239', 'A0011s.png', 'A0011sig.png', 'A', 'NIMISHA', 'A0011w.png', '', 'A0011ud.png', '', 'A0011ud1.png', '', 'A0011ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. VIJAY V. ADWALIA', 'A-044', 'A0012s.png', 'A0012sig.png', 'A', 'PRITI', 'A0012w.png', '', 'A0012ud.png', '', 'A0012ud1.png', '', 'A0012ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. ANIL M. AGARWAL', 'A-051', 'A0013s.png', 'A0013sig.png', 'A', 'LATA', 'A0013w.png', '', 'A0013ud.png', '', 'A0013ud1.png', '', 'A0013ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. B.I. AGARWAL', 'A-053', 'A0014s.png', 'A0014sig.png', 'A', 'PUSHPA', 'A0014w.png', '', 'A0014ud.png', '', 'A0014ud1.png', '', 'A0014ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. PRAMOD AGARWAL', 'A-058', 'A0015s.png', 'A0015sig.png', 'A', 'MEENA', 'A0015w.png', '', 'A0015ud.png', '', 'A0015ud1.png', '', 'A0015ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. PREMKUMAR N. AGARWAL', 'A-060', 'A0016s.png', 'A0016sig.png', 'A', 'SARITA', 'A0016w.png', '', 'A0016ud.png', '', 'A0016ud1.png', '', 'A0016ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. RAJENDRA L. AGARWAL', 'A-062', 'A0017s.png', 'A0017sig.png', 'A', 'SUNITA', 'A0017w.png', '', 'A0017ud.png', '', 'A0017ud1.png', '', 'A0017ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. ANUPAM AGARWALLA', 'A-351', 'A0018s.png', 'A0018sig.png', 'A', 'GANGA', 'A0018w.png', '', 'A0018ud.png', '', 'A0018ud1.png', '', 'A0018ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. DIPAK AGARWALLA', 'A-243', 'A0019s.png', 'A0019sig.png', 'A', 'VIBHA', 'A0019w.png', '', 'A0019ud.png', '', 'A0019ud1.png', '', 'A0019ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. PADAM RAJ AGGARWAL', 'A-081', 'A0021s.png', 'A0021sig.png', 'A', 'NEENA', 'A0021w.png', '', 'A0021ud.png', '', 'A0021ud1.png', '', 'A0021ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. VIJAY B. AGGARWAL', 'A-087', 'A0022s.png', 'A0022sig.png', 'A', 'MONICA', 'A0022w.png', '', 'A0022ud.png', '', 'A0022ud1.png', '', 'A0022ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. AMAR AHLUWALIA', 'A-093', 'A0024s.png', 'A0024sig.png', 'A', 'RUBY', 'A0024w.png', 'KAVATI', 'A0024ud.png', '', 'A0024ud1.png', '', 'A0024ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. ARVINDER S. AHLUWALIA', 'A-094', 'A0025s.png', 'A0025sig.png', 'A', 'DOLLY', 'A0025w.png', '', 'A0025ud.png', '', 'A0025ud1.png', '', 'A0025ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. TINDER AHLUWALIA', 'A-095', 'A0026s.png', 'A0026sig.png', 'A', 'NEELA', 'A0026w.png', '', 'A0026ud.png', '', 'A0026ud1.png', '', 'A0026ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. ASHFAK A. AHMED', 'A-271', 'A0027s.png', 'A0027sig.png', 'A', 'RASHIDA', 'A0027w.png', '', 'A0027ud.png', '', 'A0027ud1.png', '', 'A0027ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MRS FARAH SULTAN AHMED', 'A-2049', 'A0028s.png', 'A0028sig.png', 'A', 'SULTAN (EXPIRED)', 'A0028w.png', '', 'A0028ud.png', '', 'A0028ud1.png', '', 'A0028ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. S. A. AHMEDBHOY', 'A-100', 'A0030s.png', 'A0030sig.png', 'A', '', 'A0030w.png', '', 'A0030ud.png', '', 'A0030ud1.png', '', 'A0030ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. RAVISH KUMAR AHUJA', 'A-111', 'A0031s.png', 'A0031sig.png', 'A', 'REWA', 'A0031w.png', 'RIMA', 'A0031ud.png', '', 'A0031ud1.png', '', 'A0031ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. YUSUF ALLANA', 'A-135', 'A0033s.png', 'A0033sig.png', 'A', 'TASNEEM', 'A0033w.png', '', 'A0033ud.png', '', 'A0033ud1.png', '', 'A0033ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. ATUL N. AMERSEY', 'A-139', 'A0034s.png', 'A0034sig.png', 'A', 'RASHMEE', 'A0034w.png', '', 'A0034ud.png', '', 'A0034ud1.png', '', 'A0034ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. HARSH AMERSEY', 'A-329', 'A0035s.png', 'A0035sig.png', 'A', 'MANSI', 'A0035w.png', '', 'A0035ud.png', '', 'A0035ud1.png', '', 'A0035ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. HEMANTKUMAR AMESUR', 'A-144', 'A0038s.png', 'A0038sig.png', 'A', '', 'A0038w.png', '', 'A0038ud.png', '', 'A0038ud1.png', '', 'A0038ud2.png', '', '');"); });
+  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. BHARAT H. AMIN', 'A-145', 'A0039s.png', 'A0039sig.png', 'A', 'ACHLA', 'A0039w.png', '', 'A0039ud.png', '', 'A0039ud1.png', '', 'A0039ud2.png', '', '');"); });
+
+  //db.transaction(function(transaction) {
+    //transaction.executeSql('INSERT INTO member(name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', ['MR. MINOO ABADAN', 'A-001', 'A0001s.png', 'A0001sig.png', 'A', 'ROOMA', 'A0001w.png', 'aaa', 'A0001ud.png', 'aaa', 'A0001ud1.png', 'aaa', 'A0001ud2.png', 'aaa', 'aaa'], nullHandler,errorHandler);
+    //transaction.executeSql('INSERT INTO member(name, membership_no) VALUES (?,?)',['minoo', '001'], nullHandler,errorHandler);
+  //});
+  // this calls the function that will show what is in the User table in the database
+  ListDBValues();
+  return false;
 }
 </script>
-    </body>
-</html>
+</head>
+<body onload="onBodyLoad()">
+    <div class="main-content">
+        <div id="page">
+            <h1>Member Search</h1>
+            <form id="searchForm" method="post">
+            <fieldset>
+                    <input id="s" type="text" />
+                    <input type="button" value="Submit" id="submitButton" />
+                    <input type="button" value="Add Record" id="add_record" style="margin-top:20px;"/>
+                </fieldset>
+            </form>
+            <div id="lbUsers" style="text-align:center;border:1px solid #000000;"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        
+    </script>
+    <script type="text/javascript">
+        $("#submitButton").click(function() {
+            ListDBValues();
+        });
+        $("#add_record").click(function() {
+            AddValueToDB();
+        });
+        /*
+        window.onload = function(){
+            document.getElementById('send').onclick = function(e){
+                alert(document.getElementById("name").value);
+                return false;
+            }
+        }
+        */
+    </script>
+</body>
+<!--
+<body onload="onBodyLoad()">
+<h1>WebSQL</h1>
+<input id="txFirstName" type="text" placeholder="FirstName">
+<input id="txLastName" type="text" placeholder="Last Name">
+<input type="button" value="Add record" onClick="AddValueToDB()">
+<input type="button" value="Refresh" onClick="ListDBValues()"> <br>
+<input type="button" value="Import CSV" onClick="importcsv()"> <br>
+<br>
+<span style="font-weight:bold;">Currently stored values:</span>
+<span id="lbUsers"></span>
+</body>
+-->
+</html> 

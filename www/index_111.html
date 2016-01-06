@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <title>Memeber Search</title>
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        // global variables
+        var db;
+        var shortName = 'WebSqlDB';
+        var version = '1.0';
+        var displayName = 'WebSqlDB';
+        var maxSize = 65535;
+
+        // this is called when an error happens in a transaction
+        function errorHandler(transaction, error) {
+           alert('Error: ' + error.message + ' code: ' + error.code);
+
+        }
+
+        // this is called when a successful transaction happens
+        function successCallBack() {
+           //alert("DEBUGGING: success");
+        }
+
+        function nullHandler(){
+
+        };
+
+        // called when the application loads
+        function onBodyLoad(){
+            // This alert is used to make sure the application is loaded correctly
+            // you can comment this out once you have the application working
+            //alert("DEBUGGING: we are in the onBodyLoad() function");
+            if (!window.openDatabase) {
+                // not all mobile devices support databases  if it does not, the following alert will display
+                // indicating the device will not be albe to run this application
+                alert('Databases are not supported in this browser.');
+                return;
+            }
+            // this line tries to open the database base locally on the device
+            // if it does not exist, it will create it and return a database object stored in variable db
+            db = openDatabase(shortName, version, displayName,maxSize);
+            //console.log('CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, name TEXT NOT NULL, membership_no TEXT NOT NULL, photo TEXT NOT NULL, signature TEXT NOT NULL, category TEXT NOT NULL, spouse_name TEXT NOT NULL, spouse_photo TEXT NOT NULL, d1_name TEXT NOT NULL, d1_photo TEXT NOT NULL, d2_name TEXT NOT NULL, d2_photo TEXT NOT NULL, d3_name TEXT NOT NULL, d3_photo TEXT NOT NULL, exit_status TEXT NOT NULL, exit_reason TEXT NOT NULL)');
+            // this line will try to create the table User in the database just created/openned
+            db.transaction(function(tx){
+                // you can uncomment this next line if you want the User table to be empty each time the application runs
+                tx.executeSql( 'DROP TABLE member',nullHandler,nullHandler);
+                // this line actually creates the table User if it does not exist and sets up the three columns and their types
+                // note the UserId column is an auto incrementing column which is useful if you want to pull back distinct rows
+                // easily from the table.
+                tx.executeSql( 'CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, name TEXT NOT NULL, membership_no TEXT NOT NULL)', [],nullHandler,errorHandler);
+                //tx.executeSql( 'CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, name TEXT NOT NULL, membership_no TEXT NOT NULL, photo TEXT NOT NULL, signature TEXT NOT NULL, category TEXT NOT NULL, spouse_name TEXT NOT NULL, spouse_photo TEXT NOT NULL, d1_name TEXT NOT NULL, d1_photo TEXT NOT NULL, d2_name TEXT NOT NULL, d2_photo TEXT NOT NULL, d3_name TEXT NOT NULL, d3_photo TEXT NOT NULL, exit_status TEXT NOT NULL, exit_reason TEXT NOT NULL)', [],nullHandler,errorHandler);
+            },errorHandler,successCallBack);
+        }
+
+        // list the values in the database to the screen using jquery to update the #lbUsers element
+        function ListDBValues() {
+          if (!window.openDatabase) {
+            alert('Databases are not supported in this browser.');
+            return;
+          }
+          // this line clears out any content in the #lbUsers element on the page so that the next few lines will show updated
+          // content and not just keep repeating lines
+          $('#lbUsers').html('');
+          // this next section will select all the content from the User table and then go through it row by row
+          // appending the UserId  FirstName  LastName to the  #lbUsers element on the page
+          sear = $('#s').val();
+          console.log('SELECT * FROM member WHERE name LIKE ' + sear);
+          db.transaction(function(transaction) {
+            transaction.executeSql('SELECT * FROM `member` WHERE `name` LIKE "%'+sear+'%" ', [],
+             function(transaction, result) {
+              console.log(result);
+              if (result != null && result.rows != null) {
+                for (var i = 0; i < result.rows.length; i++) {
+                  var row = result.rows.item(i);
+                  $('#lbUsers').append('<br><a style="color:#000000;" href="view_mem.html?id='+row.name+'">' + row.name + '. ' +
+                  row.membership_no + '</a>');
+                }
+              }
+             },errorHandler);
+          },errorHandler,nullHandler);
+          return;
+        }
+
+        // this is the function that puts values into the database using the values from the text boxes on the screen
+        function AddValueToDB() {
+            if (!window.openDatabase) {
+                alert('Databases are not supported in this browser.');
+                return;
+            }
+            // db.transaction(function(transaction) { 
+            //     transaction.executeSql('INSERT INTO member(name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', ['MR. MINOO ABADAN', 'A-001', 'A0001s.png', 'A0001sig.png', 'A', 'ROOMA', 'A0001w.png', 'aaa', 'A0001ud.png', 'aaa', 'A0001ud1.png', 'aaa', 'A0001ud2.png', 'aaa', 'aaa'], nullHandler,errorHandler);
+            // });
+            db.transaction(function(transaction) {
+                transaction.executeSql('INSERT INTO member(name, membership_no) VALUES (?,?)',['minoo', '001'], nullHandler,errorHandler);
+            });
+            //db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MUKESH S. ACHARYA', 'A-015', 'A0002s.png', 'A0002sig.png', 'A', 'ASHA', 'A0002w.png', '', 'A0002ud.png', '', 'A0002ud1.png', '', 'A0002ud2.png', '', '')"); });
+            ListDBValues();
+            return false;
+        }
+    </script>
+</head>
+<body onload="onBodyLoad()">
+    <div class="main-content">
+        <div id="page">
+            <h1>Member Search</h1>
+            <form id="searchForm" method="post">
+        		<fieldset>
+                    <input id="s" type="text" />
+                    <input type="button" value="Submit" id="submitButton" />
+                    <input type="button" value="Add Record" id="add_record" style="margin-top:20px;"/>
+                    <a href="index_1.html">aaaa</a>
+                </fieldset>
+            </form>
+            <div id="lbUsers" style="text-align:center;border:1px solid #000000;"></div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        
+    </script>
+    <script type="text/javascript">
+        $("#submitButton").click(function() {
+            ListDBValues();
+        });
+        $("#add_record").click(function() {
+            AddValueToDB();
+        });
+        /*
+        window.onload = function(){
+            document.getElementById('send').onclick = function(e){
+                alert(document.getElementById("name").value);
+                return false;
+            }
+        }
+        */
+    </script>
+</body>
+</html>

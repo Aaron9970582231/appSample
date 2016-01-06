@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2014 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <link rel="stylesheet" type="text/css" href="css/form-register.css" />
+        <title>Mmebers Search</title>
+        <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <link href='http://fonts.googleapis.com/css?family=Bitter' rel='stylesheet' type='text/css'>
+        <script type="text/javascript">
+            function getURLParameter(name) {
+                return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null
+            }
+            
+        </script>
+        <script type="text/javascript" charset="utf-8">
+            // global variables
+            var db;
+            var shortName = 'WebSqlDB';
+            var version = '1.0';
+            var displayName = 'WebSqlDB';
+            var maxSize = 65535;
+
+            // this is called when an error happens in a transaction
+            function errorHandler(transaction, error) {
+               alert('Error: ' + error.message + ' code: ' + error.code);
+
+            }
+            // this is called when a successful transaction happens
+            function successCallBack() {
+               //alert("DEBUGGING: success");
+            }
+            function nullHandler(){
+
+            };
+            // called when the application loads
+            function onBodyLoad(){
+                // This alert is used to make sure the application is loaded correctly
+                // you can comment this out once you have the application working
+                //alert("DEBUGGING: we are in the onBodyLoad() function");
+                if (!window.openDatabase) {
+                    // not all mobile devices support databases  if it does not, the following alert will display
+                    // indicating the device will not be albe to run this application
+                    alert('Databases are not supported in this browser.');
+                    return;
+                }
+                // this line tries to open the database base locally on the device
+                // if it does not exist, it will create it and return a database object stored in variable db
+                db = openDatabase(shortName, version, displayName,maxSize);
+                ListDBValues();
+            }
+
+            // list the values in the database to the screen using jquery to update the #lbUsers element
+            function ListDBValues() {
+              if (!window.openDatabase) {
+                alert('Databases are not supported in this browser.');
+                return;
+              }
+              $('#form-white-background').html('');
+              myvar = getURLParameter('id');
+              db.transaction(function(transaction) {
+                transaction.executeSql('SELECT * FROM `member` WHERE `id` = "'+parseInt(myvar)+'" ', [],    
+                 function(transaction, result) {
+                  if (result.rows.length > 0) {
+                    for (var i = 0; i < result.rows.length; i++) {
+                        var row = result.rows.item(i);
+                        html = '<div class="form-row" style="float:right;">';
+                            html += '<a href="index.html">Back</a>';
+                        html += '</div>'
+                        html += '<div class=form-title-row>';
+                            html += '<img src="photo/'+row.photo+'" />';
+                            html += '<img src="photo/'+row.signature+'" />';
+                            html += '<h2>'+row.name+'</h2>';
+                            if(row.category == 'A'){
+                                category = 'Club';
+                            } 
+                            if(row.category == 'B'){
+                                category = 'Life';
+                            }
+                            if(row.category == 'C'){
+                                category = 'Stand';
+                            }
+                            if(row.category == 'D'){
+                                category = 'Lady Stand';
+                            }
+                            if(row.category == 'E'){
+                                category = 'Local';
+                            }
+                            if(row.category == 'F'){
+                                category = 'Local Corporate';
+                            }
+                            if(row.category == 'G'){
+                                category = 'Temp(Art.33)';
+                            }
+                            if(row.category == 'H'){
+                                category = 'Temp(Art.34)';
+                            }
+                            if(row.category == 'I'){
+                                category = 'Short Term';
+                            }
+                            if(row.category == 'J'){
+                                category = 'Invitee';
+                            }
+                            if(row.category == ''){
+                                category = 'NIL';
+                            }
+                            if(row.exit_status != ''){
+                                html += '<h2>'+category+' ( '+row.exit_status+' - '+row.exit_reason+' )</h2>';
+                            } else {
+                                html += '<h2> Status : '+category+' (Active Member)</h2>';
+                            }
+                        html += '</div>';
+                        html += '<div class="form-row">';
+                            html += '<label>';
+                                html += '<span>Name</span>';
+                                html += row.name;
+                            html += '</label>';
+                        html += '</div>';
+                        html += '<div class="form-row">';
+                            html += '<label>';
+                                html += '<span  style="width:150px;">Membership No</span>';
+                                html += row.membership_no;
+                            html += '</label>';
+                        html += '</div>';
+                        if(row.spouse_name != ''){
+                            html += '<div class=form-title-row>';
+                                if(row.spouse_photo != ''){
+                                    html += '<img src="photo/'+row.spouse_photo+'" />';
+                                }
+                            html += '</div>';
+                            html += '<div class="form-row">';
+                                html += '<label>';
+                                    html += '<span style="width:150px;">Spouse Name</span>';
+                                    html += row.spouse_name;
+                                html += '</label>';
+                            html += '</div>';
+                        }
+                        if(row.d1_name != ''){
+                            html += '<div class=form-title-row>';
+                                if(row.d1_photo != ''){
+                                    html += '<img src="photo/'+row.d1_photo+'" />';
+                                }
+                            html += '</div>';
+                            html += '<div class="form-row">';
+                                html += '<label>';
+                                    html += '<span style="width:150px;">Daughter Name 1</span>';
+                                    html += row.d1_name;
+                                html += '</label>';
+                            html += '</div>';
+                        }
+                        if(row.d2_name != ''){
+                            html += '<div class=form-title-row>';
+                                if(row.d2_photo != ''){
+                                    html += '<img src="photo/'+row.d2_photo+'" />';
+                                }
+                            html += '</div>';
+                            html += '<div class="form-row">';
+                                html += '<label>';
+                                    html += '<span style="width:150px;">Daughter Name 2</span>';
+                                    html += row.d2_name;
+                                html += '</label>';
+                            html += '</div>';
+                        }
+                        if(row.d3_name != ''){
+                            html += '<div class=form-title-row>';
+                                if(row.d3_photo != ''){
+                                    html += '<img src="photo/'+row.d3_photo+'" />';
+                                }
+                            html += '</div>';
+                            html += '<div class="form-row">';
+                                html += '<label>';
+                                    html += '<span style="width:150px;">Daughter Name 3</span>';
+                                    html += row.d3_name;
+                                html += '</label>';
+                            html += '</div>';
+                        }
+                        html += '<div class="form-row" style="float:right;">';
+                            html += '<a href="index.html">Back</a>';
+                        html += '</div>'
+                        console.log(html);
+                      $('.form-white-background').append(html);
+                    }
+                  }
+                 },errorHandler);
+              },errorHandler,nullHandler);
+              return;
+            }
+        </script>
+    </head>
+    <body onload="onBodyLoad()">
+        <div class="main-content">
+            <!-- You only need this form and the form-register.css -->
+            <form class="form-register" method="post" action="#">
+                <div class="form-register-with-email">
+                    <div class="form-white-background">
+                        <!--
+                        <div class="form-title-row">
+                            <h2 id="membername">Create an account</h2>
+                        </div>
+                        <div class="form-row">
+                            <label>
+                                <span>Name</span>
+                                <input type="text" name="name" id="name">
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <label>
+                                <span>Email</span>
+                                <input type="email" name="email">
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <label>
+                                <span>Password</span>
+                                <input type="password" name="password">
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <label class="form-checkbox">
+                                <input type="checkbox" name="checkbox" checked>
+                                <span>I agree to the <a href="#">terms and conditions</a></span>
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <button type="submit" id="send">Register</button>
+                        </div>
+                        -->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </body>
+</html>
