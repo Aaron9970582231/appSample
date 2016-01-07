@@ -130,7 +130,7 @@ function ListDBValues() {
   $('#lbUsers').html('');
   // this next section will select all the content from the User table and then go through it row by row
   // appending the UserId  FirstName  LastName to the  #lbUsers element on the page
-  alert('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" OR `membership_no` = "'+$('#s').val()+'" ORDER BY name ASC');
+  //alert('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" OR `membership_no` = "'+$('#s').val()+'" ORDER BY name ASC');
   db.transaction(function(transaction) {
    transaction.executeSql('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" OR `membership_no` = "'+$('#s').val()+'" ORDER BY name ASC', [],
      function(transaction, result) {
@@ -178,6 +178,10 @@ function AddValueToDB() {
     return;
   }
   alert('Start');
+  db.transaction(function(tx){
+    tx.executeSql( 'DROP TABLE member',nullHandler,nullHandler);
+    tx.executeSql( 'CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, title TEXT NOT NULL, name TEXT NOT NULL, membership_no TEXT NOT NULL, photo TEXT NOT NULL, signature TEXT NOT NULL, category TEXT NOT NULL, spouse_name TEXT NOT NULL, spouse_photo TEXT NOT NULL, d1_name TEXT NOT NULL, d1_photo TEXT NOT NULL, d2_name TEXT NOT NULL, d2_photo TEXT NOT NULL, d3_name TEXT NOT NULL, d3_photo TEXT NOT NULL, exit_status TEXT NOT NULL, exit_reason TEXT NOT NULL)', [],nullHandler,errorHandler);
+  },errorHandler,successCallBack);
   db.transaction(function(transaction) { transaction.executeSql("DELETE FROM member"); });
   addvalue1000();
   // // this is the section that actually inserts the values into the User table
