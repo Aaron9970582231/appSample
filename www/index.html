@@ -61,6 +61,10 @@ you must download this and include the directory your html file is in
 <script type="text/javascript" src="js/value4000.js"></script>
 <script type="text/javascript" src="js/value5000.js"></script>
 <script type="text/javascript" src="js/value6000.js"></script>
+<script type="text/javascript" src="js/value7000.js"></script>
+<script type="text/javascript" src="js/value8000.js"></script>
+<script type="text/javascript" src="js/value9000.js"></script>
+<script type="text/javascript" src="js/value10000.js"></script>
 <link rel="stylesheet" type="text/css" href="css/styles.css" />
 <link rel="stylesheet" type="text/css" href="css/index.css" />
 <!-- main scripts used in this example -->
@@ -111,7 +115,7 @@ function onBodyLoad(){
     // note the UserId column is an auto incrementing column which is useful if you want to pull back distinct rows
     // easily from the table.
       //tx.executeSql( 'CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, name TEXT NOT NULL, membership_no TEXT NOT NULL)', [],nullHandler,errorHandler);
-      tx.executeSql( 'CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, name TEXT NOT NULL, membership_no TEXT NOT NULL, photo TEXT NOT NULL, signature TEXT NOT NULL, category TEXT NOT NULL, spouse_name TEXT NOT NULL, spouse_photo TEXT NOT NULL, d1_name TEXT NOT NULL, d1_photo TEXT NOT NULL, d2_name TEXT NOT NULL, d2_photo TEXT NOT NULL, d3_name TEXT NOT NULL, d3_photo TEXT NOT NULL, exit_status TEXT NOT NULL, exit_reason TEXT NOT NULL)', [],nullHandler,errorHandler);
+      tx.executeSql( 'CREATE TABLE IF NOT EXISTS member(id INTEGER NOT NULL PRIMARY KEY, title TEXT NOT NULL, name TEXT NOT NULL, membership_no TEXT NOT NULL, photo TEXT NOT NULL, signature TEXT NOT NULL, category TEXT NOT NULL, spouse_name TEXT NOT NULL, spouse_photo TEXT NOT NULL, d1_name TEXT NOT NULL, d1_photo TEXT NOT NULL, d2_name TEXT NOT NULL, d2_photo TEXT NOT NULL, d3_name TEXT NOT NULL, d3_photo TEXT NOT NULL, exit_status TEXT NOT NULL, exit_reason TEXT NOT NULL)', [],nullHandler,errorHandler);
     },errorHandler,successCallBack);
 }
 
@@ -126,8 +130,9 @@ function ListDBValues() {
   $('#lbUsers').html('');
   // this next section will select all the content from the User table and then go through it row by row
   // appending the UserId  FirstName  LastName to the  #lbUsers element on the page
+  alert('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" OR `membership_no` = "'+$('#s').val()+'" ORDER BY name ASC');
   db.transaction(function(transaction) {
-   transaction.executeSql('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" ORDER BY name ASC', [],
+   transaction.executeSql('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" OR `membership_no` = "'+$('#s').val()+'" ORDER BY name ASC', [],
      function(transaction, result) {
       if (result != null && result.rows != null) {
         for (var i = 0; i < result.rows.length; i++) {
@@ -176,7 +181,8 @@ function AddValueToDB() {
   db.transaction(function(transaction) { transaction.executeSql("DELETE FROM member"); });
   addvalue1000();
   // // this is the section that actually inserts the values into the User table
-  // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MINOO ABADAN', 'A-001', 'A0001s.png', 'A0001sig.png', 'A', 'ROOMA', 'A0001w.png', '', 'A0001ud.png', '', 'A0001ud1.png', '', 'A0001ud2.png', '', '');"); });
+  //db.transaction(function(transaction) { transaction.executeSql('INSERT INTO member (title, name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ("MR.", "MINOO ABADAN", "A-001", "A0001s.png", "A0001sig.png", "A", "ROOMA", "A0001w.png", "", "A0001ud.png", "", "A0001ud1.png", "", "A0001ud2.png", "", "");'); });
+  //db.transaction(function(transaction) { transaction.executeSql('INSERT INTO member (title, name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ("MR.", "EDWARD J. D\'MELLOW", "D-345", "A0199s.png", "A0199sig.png", "A", "ELVEERA", "A0199w.png", "", "A0199ud.png", "", "A0199ud1.png", "", "A0199ud2.png", "", "");'); });
   // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MUKESH S. ACHARYA', 'A-015', 'A0002s.png', 'A0002sig.png', 'A', 'ASHA', 'A0002w.png', '', 'A0002ud.png', '', 'A0002ud1.png', '', 'A0002ud2.png', '', '');"); });
   // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. RISHI M. ACHARYA', 'A-368', 'A0003s.png', 'A0003sig.png', 'A', '', 'A0003w.png', '', 'A0003ud.png', '', 'A0003ud1.png', '', 'A0003ud2.png', '', '');"); });
   // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. YEZDI D. ACIDWALLA', 'A-016', 'A0004s.png', 'A0004sig.png', 'A', 'NAWAZ', 'A0004w.png', '', 'A0004ud.png', '', 'A0004ud1.png', '', 'A0004ud2.png', '', '');"); });
@@ -246,11 +252,57 @@ function AddValueToDB5() {
   return false;
 }
 
+function AddValueToDB6() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue7000();
+  ListDBValuess();
+  return false;
+}
+
+function AddValueToDB7() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue8000();
+  ListDBValuess();
+  return false;
+}
+
+function AddValueToDB8() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue9000();
+  ListDBValuess();
+  return false;
+}
+
+function AddValueToDB9() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue10000();
+  ListDBValuess();
+  return false;
+}
 </script>
 </head>
 <body onload="onBodyLoad()">
     <div class="main-content">
         <div id="page">
+            <div style="text-align:center;">
+              <img src="img/rwitc_logo.png" />
+            </div>
             <h1>Member Search</h1>
             <form id="searchForm" method="post">
             <fieldset>
@@ -262,6 +314,10 @@ function AddValueToDB5() {
                     <input class="btntog" type="button" value="Add Record3" id="add_record3" style="display:none;margin-top:20px;cursor:pointer;"/>
                     <input class="btntog" type="button" value="Add Record4" id="add_record4" style="display:none;margin-top:20px;cursor:pointer;"/>
                     <input class="btntog" type="button" value="Add Record5" id="add_record5" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record6" id="add_record6" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record7" id="add_record7" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record8" id="add_record8" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record9" id="add_record9" style="display:none;margin-top:20px;cursor:pointer;"/>
                 </fieldset>
             </form>
             <div id="lbUsers" style="text-align:center;border:1px solid #000000;"></div>
@@ -296,6 +352,18 @@ function AddValueToDB5() {
             AddValueToDB4();
         });
         $("#add_record5").click(function() {
+            AddValueToDB5();
+        });
+        $("#add_record6").click(function() {
+            AddValueToDB5();
+        });
+        $("#add_record7").click(function() {
+            AddValueToDB5();
+        });
+        $("#add_record8").click(function() {
+            AddValueToDB5();
+        });
+        $("#add_record9").click(function() {
             AddValueToDB5();
         });
     </script>

@@ -13,7 +13,7 @@ body{
 #page{
 	/* The main container div */
 	width:620px;
-	margin:100px auto 0;
+	margin:25px auto 0;
 }
 
 h1{
@@ -54,12 +54,12 @@ fieldset{
 	/* The search text box. */
 	
 	border:none;
-	color:#888888;
+	color:#000000;
 	background:url("img/searchBox.png") no-repeat;
 	
 	float:left;
 	font-family:Arial,Helvetica,sans-serif;
-	font-size:15px;
+	font-size:22px;
 	height:36px;
 	line-height:36px;
 	margin-right:12px;
