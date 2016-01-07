@@ -92,8 +92,8 @@
                             html += '<a href="index.html">Back</a>';
                         html += '</div>'
                         html += '<div class=form-title-row>';
-                            html += '<img src="file:///storage/emulated/0/Pictures/'+row.photo+'" />';
-                            html += '<img src="file:///storage/emulated/0/Pictures/'+row.signature+'" />';
+                            html += '<img src="photo/'+row.photo.toLowerCase()+'" />';
+                            html += '<img src="file:///storage/emulated/0/Pictures/'+row.signature.toLowerCase()+'" />';
                             html += '<h2>'+row.name+'</h2>';
                             if(row.category == 'A'){
                                 category = 'Club';
@@ -149,7 +149,7 @@
                         if(row.spouse_name != ''){
                             html += '<div class=form-title-row>';
                                 if(row.spouse_photo != ''){
-                                    html += '<img src="file:///storage/emulated/0/Pictures/'+row.spouse_photo+'" />';
+                                    html += '<img src="file:///storage/emulated/0/Pictures/'+row.spouse_photo.toLowerCase()+'" />';
                                 }
                             html += '</div>';
                             html += '<div class="form-row">';
@@ -162,7 +162,7 @@
                         if(row.d1_name != ''){
                             html += '<div class=form-title-row>';
                                 if(row.d1_photo != ''){
-                                    html += '<img src="file:///storage/emulated/0/Pictures/'+row.d1_photo+'" />';
+                                    html += '<img src="file:///storage/emulated/0/Pictures/'+row.d1_photo.toLowerCase()+'" />';
                                 }
                             html += '</div>';
                             html += '<div class="form-row">';
@@ -175,7 +175,7 @@
                         if(row.d2_name != ''){
                             html += '<div class=form-title-row>';
                                 if(row.d2_photo != ''){
-                                    html += '<img src="file:///storage/emulated/0/Pictures/'+row.d2_photo+'" />';
+                                    html += '<img src="file:///storage/emulated/0/Pictures/'+row.d2_photo.toLowerCase()+'" />';
                                 }
                             html += '</div>';
                             html += '<div class="form-row">';
@@ -188,7 +188,7 @@
                         if(row.d3_name != ''){
                             html += '<div class=form-title-row>';
                                 if(row.d3_photo != ''){
-                                    html += '<img src="file:///storage/emulated/0/Pictures/'+row.d3_photo+'" />';
+                                    html += '<img src="file:///storage/emulated/0/Pictures/'+row.d3_photo.toLowerCase()+'" />';
                                 }
                             html += '</div>';
                             html += '<div class="form-row">';
@@ -201,7 +201,7 @@
                         html += '<div class="form-row" style="float:right;">';
                             html += '<a href="index.html">Back</a>';
                         html += '</div>'
-                        console.log(html);
+                        //console.log(html);
                       $('.form-white-background').append(html);
                     }
                   }
