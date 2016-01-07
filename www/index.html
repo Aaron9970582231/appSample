@@ -127,7 +127,7 @@ function ListDBValues() {
   // this next section will select all the content from the User table and then go through it row by row
   // appending the UserId  FirstName  LastName to the  #lbUsers element on the page
   db.transaction(function(transaction) {
-   transaction.executeSql('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" ', [],
+   transaction.executeSql('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" ORDER BY name ASC', [],
      function(transaction, result) {
       if (result != null && result.rows != null) {
         for (var i = 0; i < result.rows.length; i++) {
