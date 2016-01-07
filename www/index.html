@@ -137,7 +137,7 @@ function ListDBValues() {
       if (result != null && result.rows != null) {
         for (var i = 0; i < result.rows.length; i++) {
           var row = result.rows.item(i);
-          $('#lbUsers').append('<br><a style="color:#000000;font-size:18px;" href="view_mem.html?id='+row.id+'">' + row.name + '. ' +
+          $('#lbUsers').append('<br><a style="color:#000000;font-size:18px;" href="view_mem.html?id='+row.id+'">' + row.title + ' ' +row.name + '. ' +
           row.membership_no + '</a><br>');
         }
       }
