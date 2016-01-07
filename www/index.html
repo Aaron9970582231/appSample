@@ -55,6 +55,12 @@ you must download this and include the directory your html file is in
 -->
 <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
 <script type="text/javascript" src="js/jquery.csv-0.71.js"></script>
+<script type="text/javascript" src="js/value1000.js"></script>
+<script type="text/javascript" src="js/value2000.js"></script>
+<script type="text/javascript" src="js/value3000.js"></script>
+<script type="text/javascript" src="js/value4000.js"></script>
+<script type="text/javascript" src="js/value5000.js"></script>
+<script type="text/javascript" src="js/value6000.js"></script>
 <link rel="stylesheet" type="text/css" href="css/styles.css" />
 <link rel="stylesheet" type="text/css" href="css/index.css" />
 <!-- main scripts used in this example -->
@@ -126,7 +132,32 @@ function ListDBValues() {
       if (result != null && result.rows != null) {
         for (var i = 0; i < result.rows.length; i++) {
           var row = result.rows.item(i);
-          $('#lbUsers').append('<br><a style="color:#000000;" href="view_mem.html?id='+row.id+'">' + row.name + '. ' +
+          $('#lbUsers').append('<br><a style="color:#000000;font-size:18px;" href="view_mem.html?id='+row.id+'">' + row.name + '. ' +
+          row.membership_no + '</a><br>');
+        }
+      }
+     },errorHandler);
+  },errorHandler,nullHandler);
+  return;
+}
+
+function ListDBValuess() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  // this line clears out any content in the #lbUsers element on the page so that the next few lines will show updated
+  // content and not just keep repeating lines
+  $('#lbUsers').html('');
+  // this next section will select all the content from the User table and then go through it row by row
+  // appending the UserId  FirstName  LastName to the  #lbUsers element on the page
+  db.transaction(function(transaction) {
+   transaction.executeSql('SELECT * FROM `member` WHERE `id` = "1" ', [],
+     function(transaction, result) {
+      if (result != null && result.rows != null) {
+        for (var i = 0; i < result.rows.length; i++) {
+          var row = result.rows.item(i);
+          $('#lbUsers').append('<br><a style="color:#000000;font-size:18px;" href="view_mem.html?id='+row.id+'">' + row.name + '. ' +
           row.membership_no + '</a>');
         }
       }
@@ -141,22 +172,80 @@ function AddValueToDB() {
     alert('Databases are not supported in this browser.');
     return;
   }
+  alert('Start');
   db.transaction(function(transaction) { transaction.executeSql("DELETE FROM member"); });
-  // this is the section that actually inserts the values into the User table
-  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MINOO ABADAN', 'A-001', 'A0001s.png', 'A0001sig.png', 'A', 'ROOMA', 'A0001w.png', '', 'A0001ud.png', '', 'A0001ud1.png', '', 'A0001ud2.png', '', '');"); });
-  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MUKESH S. ACHARYA', 'A-015', 'A0002s.png', 'A0002sig.png', 'A', 'ASHA', 'A0002w.png', '', 'A0002ud.png', '', 'A0002ud1.png', '', 'A0002ud2.png', '', '');"); });
-  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. RISHI M. ACHARYA', 'A-368', 'A0003s.png', 'A0003sig.png', 'A', '', 'A0003w.png', '', 'A0003ud.png', '', 'A0003ud1.png', '', 'A0003ud2.png', '', '');"); });
-  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. YEZDI D. ACIDWALLA', 'A-016', 'A0004s.png', 'A0004sig.png', 'A', 'NAWAZ', 'A0004w.png', '', 'A0004ud.png', '', 'A0004ud1.png', '', 'A0004ud2.png', '', '');"); });
-  db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. DINSHAW P. ADENWALLA', 'A-017', 'A0006s.png', 'A0006sig.png', 'A', 'JASMINE', 'A0006w.png', '', 'A0006ud.png', '', 'A0006ud1.png', '', 'A0006ud2.png', '', '');"); });
+  addvalue1000();
+  // // this is the section that actually inserts the values into the User table
+  // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MINOO ABADAN', 'A-001', 'A0001s.png', 'A0001sig.png', 'A', 'ROOMA', 'A0001w.png', '', 'A0001ud.png', '', 'A0001ud1.png', '', 'A0001ud2.png', '', '');"); });
+  // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. MUKESH S. ACHARYA', 'A-015', 'A0002s.png', 'A0002sig.png', 'A', 'ASHA', 'A0002w.png', '', 'A0002ud.png', '', 'A0002ud1.png', '', 'A0002ud2.png', '', '');"); });
+  // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. RISHI M. ACHARYA', 'A-368', 'A0003s.png', 'A0003sig.png', 'A', '', 'A0003w.png', '', 'A0003ud.png', '', 'A0003ud1.png', '', 'A0003ud2.png', '', '');"); });
+  // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. YEZDI D. ACIDWALLA', 'A-016', 'A0004s.png', 'A0004sig.png', 'A', 'NAWAZ', 'A0004w.png', '', 'A0004ud.png', '', 'A0004ud1.png', '', 'A0004ud2.png', '', '');"); });
+  // db.transaction(function(transaction) { transaction.executeSql("INSERT INTO member (name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) values ('MR. DINSHAW P. ADENWALLA', 'A-017', 'A0006s.png', 'A0006sig.png', 'A', 'JASMINE', 'A0006w.png', '', 'A0006ud.png', '', 'A0006ud1.png', '', 'A0006ud2.png', '', '');"); });
   
   //db.transaction(function(transaction) {
     //transaction.executeSql('INSERT INTO member(name, membership_no, photo, signature, category, spouse_name, spouse_photo, d1_name, d1_photo, d2_name, d2_photo, d3_name, d3_photo, exit_status, exit_reason) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', ['MR. MINOO ABADAN', 'A-001', 'A0001s.png', 'A0001sig.png', 'A', 'ROOMA', 'A0001w.png', 'aaa', 'A0001ud.png', 'aaa', 'A0001ud1.png', 'aaa', 'A0001ud2.png', 'aaa', 'aaa'], nullHandler,errorHandler);
     //transaction.executeSql('INSERT INTO member(name, membership_no) VALUES (?,?)',['minoo', '001'], nullHandler,errorHandler);
   //});
   // this calls the function that will show what is in the User table in the database
-  ListDBValues();
+  ListDBValuess();
   return false;
 }
+
+function AddValueToDB1() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue2000();
+  ListDBValuess();
+  return false;
+}
+
+function AddValueToDB2() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue3000();
+  ListDBValuess();
+  return false;
+}
+
+function AddValueToDB3() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue4000();
+  ListDBValuess();
+  return false;
+}
+
+function AddValueToDB4() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue5000();
+  ListDBValuess();
+  return false;
+}
+
+function AddValueToDB5() {
+  if (!window.openDatabase) {
+    alert('Databases are not supported in this browser.');
+    return;
+  }
+  alert('Start');
+  addvalue6000();
+  ListDBValuess();
+  return false;
+}
+
 </script>
 </head>
 <body onload="onBodyLoad()">
@@ -167,11 +256,19 @@ function AddValueToDB() {
             <fieldset>
                     <input id="s" type="text" />
                     <input type="button" value="Submit" id="submitButton" />
-                    <input type="button" value="Add Record" id="add_record" style="margin-top:20px;"/>
+                    <input class="btntog" type="button" value="Add Record" id="add_record" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record1" id="add_record1" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record2" id="add_record2" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record3" id="add_record3" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record4" id="add_record4" style="display:none;margin-top:20px;cursor:pointer;"/>
+                    <input class="btntog" type="button" value="Add Record5" id="add_record5" style="display:none;margin-top:20px;cursor:pointer;"/>
                 </fieldset>
             </form>
             <div id="lbUsers" style="text-align:center;border:1px solid #000000;"></div>
         </div>
+    </div>
+    <div>
+      <a id="buttonshow" style="cursor:pointer;position: fixed;bottom: 0;width: 100%;text-align:center;font-size:20px;">Poweered By EA InfoTeck</a>
     </div>
     <script type="text/javascript">
         
@@ -180,30 +277,27 @@ function AddValueToDB() {
         $("#submitButton").click(function() {
             ListDBValues();
         });
+        $("#buttonshow").click(function() {
+            $(".btntog").toggle();
+        });
         $("#add_record").click(function() {
             AddValueToDB();
         });
-        /*
-        window.onload = function(){
-            document.getElementById('send').onclick = function(e){
-                alert(document.getElementById("name").value);
-                return false;
-            }
-        }
-        */
+        $("#add_record1").click(function() {
+            AddValueToDB1();
+        });
+        $("#add_record2").click(function() {
+            AddValueToDB2();
+        });
+        $("#add_record3").click(function() {
+            AddValueToDB3();
+        });
+        $("#add_record4").click(function() {
+            AddValueToDB4();
+        });
+        $("#add_record5").click(function() {
+            AddValueToDB5();
+        });
     </script>
 </body>
-<!--
-<body onload="onBodyLoad()">
-<h1>WebSQL</h1>
-<input id="txFirstName" type="text" placeholder="FirstName">
-<input id="txLastName" type="text" placeholder="Last Name">
-<input type="button" value="Add record" onClick="AddValueToDB()">
-<input type="button" value="Refresh" onClick="ListDBValues()"> <br>
-<input type="button" value="Import CSV" onClick="importcsv()"> <br>
-<br>
-<span style="font-weight:bold;">Currently stored values:</span>
-<span id="lbUsers"></span>
-</body>
--->
 </html> 
