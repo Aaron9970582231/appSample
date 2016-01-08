@@ -134,12 +134,14 @@ function ListDBValues() {
   db.transaction(function(transaction) {
    transaction.executeSql('SELECT * FROM member WHERE name LIKE "%'+$('#s').val()+'%" OR `membership_no` = "'+$('#s').val()+'" ORDER BY name ASC', [],
      function(transaction, result) {
-      if (result != null && result.rows != null) {
+      if (result != null && result.rows.length > 0) {
         for (var i = 0; i < result.rows.length; i++) {
           var row = result.rows.item(i);
           $('#lbUsers').append('<br><a style="color:#000000;font-size:18px;" href="view_mem.html?id='+row.id+'">' + row.title + ' ' +row.name + '. ' +
           row.membership_no + '</a><br>');
         }
+      } else{
+        $('#lbUsers').append('<br><b style="color:red;padding-left:37%;font-size:18px;">Member Not Found</b>');
       }
      },errorHandler);
   },errorHandler,nullHandler);
@@ -324,7 +326,7 @@ function AddValueToDB9() {
                     <input class="btntog" type="button" value="Add Record9" id="add_record9" style="display:none;margin-top:20px;cursor:pointer;"/>
                 </fieldset>
             </form>
-            <div id="lbUsers" style="text-align:center;border:1px solid #000000;"></div>
+            <div id="lbUsers" style="text-align:left;border:1px solid #000000;padding-left:15px;"></div>
         </div>
     </div>
     <div>
